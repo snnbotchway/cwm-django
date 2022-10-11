@@ -7,6 +7,9 @@ name = "pypi"
 django = "*"
 django-debug-toolbar = "*"
 autopep8 = "*"
+psycopg2 = "*"
+django-environ = "*"
+virtualenv = "*"
 
 [dev-packages]
 
