@@ -46,6 +46,9 @@ class Customer(models.Model):
     def __str__(self):
         return self.first_name + ' ' + self.last_name
 
+    class Meta:
+        ordering=['first_name']
+
 
 class Order(models.Model):
     PENDING = 'P'
