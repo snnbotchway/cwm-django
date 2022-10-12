@@ -43,6 +43,9 @@ class Customer(models.Model):
     birth_date = models.DateField(null=True)
     phone = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
+
 
 class Order(models.Model):
     PENDING = 'P'
@@ -53,7 +56,7 @@ class Order(models.Model):
         (COMPLETE, 'Complete'),
         (FAILED, 'Failed'),
     ]
-    membership_type = models.CharField(
+    payment_status = models.CharField(
         max_length=1,
         choices=PAYMENT_STATUS_CHOICES,
         default=PENDING,

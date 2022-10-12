@@ -1,9 +1,27 @@
 <html>
-  <body>
-    {% if name %}
-    <h1>Hello {{ name }}</h1>
-    {% else %}
-    <h1>Hello World</h1>
-    {% endif %}
-  </body>
+	<body>
+		{% if name %}
+		<h1>Hello {{ name }}, you can find query results below:</h1>
+		<ul>
+			{% for item in objects %}
+			<li>
+				{{ item.id }} {{item.customer.first_name}}
+				{{item.orderitem_set}}
+				<!-- {{item}}. {%if item.first_name%} {{item.first_name}} -->
+				<!-- {{item.last_name}} {%endif%} -->
+				<!--nopep8-->
+				<!-- {%if item.email %} {{ item.email }} {% endif %} -->
+				<!--nopep8-->
+				<!-- {% if item.title %} {{ item.title }} {% endif %} -->
+				<!--nopep8-->
+				<!-- {% if item.inventory or item.inventory == 0 %} Inventory: -->
+				<!-- {{item.inventory}} {% endif%} -->
+				<!--nopep8-->
+			</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<h1>I don't know who you are.</h1>
+		{% endif %}
+	</body>
 </html>
