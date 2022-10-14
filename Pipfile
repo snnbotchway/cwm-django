@@ -10,6 +10,7 @@ autopep8 = "*"
 psycopg2 = "*"
 django-environ = "*"
 virtualenv = "*"
+djangorestframework = "*"
 
 [dev-packages]
 flake8 = "*"
