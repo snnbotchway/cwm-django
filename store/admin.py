@@ -64,8 +64,8 @@ class ProductAdmin(admin.ModelAdmin):
     # help django find the category by defining search_fields in CategoryAdmin
     actions = ['clear_inventory']
     autocomplete_fields = ['category']
-    search_fields = ['title__istartswith']
-    list_display = ['title', 'unit_price',
+    search_fields = ['title__icontains']
+    list_display = ['title', 'id', 'unit_price',
                     'inventory', 'inventory_status', 'category_title']
     list_editable = ['unit_price', 'inventory']
     list_select_related = ['category']
@@ -92,8 +92,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['title', 'product_count']
+    list_display = ['id', 'title', 'product_count']
     search_fields = ['title']
+    autocomplete_fields = ['featured_product']
 
     @admin.display(ordering='product_count')
     def product_count(self, category):
@@ -105,7 +106,7 @@ class CategoryAdmin(admin.ModelAdmin):
         return format_html('<a href={}>{}</a>', url, category.product_count)
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(product_count=Count('product'))
+        return super().get_queryset(request).annotate(product_count=Count('products'))
 
 
 class OrderItemInline(admin.TabularInline):
