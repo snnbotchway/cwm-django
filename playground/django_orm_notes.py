@@ -51,7 +51,7 @@ customers = Customer.objects.annotate(
 
 # number of orders each customer has placed
 customers = Customer.objects.annotate(
-    order_count=Count('order')
+    order_count=Count('orders')
 )
 
 # product table with new field name discounted_price(unit_price * 0.8)

@@ -11,6 +11,8 @@ psycopg2 = "*"
 django-environ = "*"
 virtualenv = "*"
 djangorestframework = "*"
+drf-nested-routers = "*"
+django-filter = "*"
 
 [dev-packages]
 flake8 = "*"
