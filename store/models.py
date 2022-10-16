@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -111,12 +112,22 @@ class Address(models.Model):
 
 
 class Cart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    cart = models.ForeignKey(
+        Cart, on_delete=models.CASCADE, related_name='cartitems')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1)], default=1)
+
+    def __str__(self) -> str:
+        return self.product
+
+    class Meta:
+        unique_together = [['product', 'cart']]
 
 
 class Review(models.Model):
