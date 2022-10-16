@@ -1,7 +1,7 @@
 from decimal import Decimal
 from rest_framework import serializers
 
-from store.models import Category, Product, Review
+from store.models import CartItem, Category, Product, Review, Cart
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -43,6 +43,41 @@ class ProductSerializer(serializers.ModelSerializer):
         return product.unit_price * Decimal(1.1)
 
     # validation method example for password == confirm_password
+
+
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price']
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    total_price = serializers.SerializerMethodField(
+        method_name='get_total_price')
+    product = SimpleProductSerializer()
+
+    class Meta:
+        model = CartItem
+        fields = ['product', 'quantity', 'total_price']
+
+    def get_total_price(self, cartitem: CartItem) -> Decimal:
+        return cartitem.quantity * cartitem.product.unit_price
+
+
+class CartSerializer(serializers.ModelSerializer):
+    cartitems = CartItemSerializer(many=True)
+    total_price = serializers.SerializerMethodField(
+        method_name='get_total_price')
+
+    def get_total_price(self, cart: Cart):
+        total_price = 0
+        for item in cart.cartitems.all():
+            total_price += item.quantity * item.product.unit_price
+        return total_price
+
+    class Meta:
+        model = Cart
+        fields = ['cartitems', 'total_price']
     # def validate(self, data):
     #     if data['password'] == data['confirm_password']:
     #         return data

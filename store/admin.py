@@ -125,6 +125,12 @@ class OrderAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
 
 
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    # inlines = [CartItemInline]
+    list_display = ['id', 'created_at']
+
+
 # @admin.register(OrderItem)
 # class OrderItemAdmin(admin.ModelAdmin):
 #     list_display = ['product', 'quantity', 'unit_price', 'customer']

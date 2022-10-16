@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Count
@@ -8,7 +9,7 @@ from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import *
 from .serializers import *
-from .models import Category, OrderItem, Product, Review
+from .models import Category, OrderItem, Product, Review, Cart
 from .paginations import ProductPagination
 
 
@@ -70,6 +71,14 @@ class ReviewViewSet(ModelViewSet):
     #     if Product.objects.filter(category_id=kwargs['pk']).count() > 0:
     #         return Response({'error': 'Category has been assigned to some products and hence, cannot be deleted'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     #     return super().destroy(request, *args, **kwargs)
+
+
+class CartViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
+    serializer_class = CartSerializer
+
+    def get_queryset(self):
+        return Cart.objects.prefetch_related('cartitems__product').all()
+    # give the serializer the product id from the url:
 
 
 # CRUD GENERIC VIEWS
