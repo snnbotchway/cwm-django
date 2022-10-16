@@ -1,18 +1,23 @@
 from decimal import Decimal
 from rest_framework import serializers
 
-from store.models import Category, Product
+from store.models import Category, Product, Review
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'rating', 'comment', 'date']
+
+    def create(self, validated_data):
+        return Review.objects.create(product_id=self.context['product_id'], **validated_data)
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'title', 'products_count']
-    products_count = serializers.SerializerMethodField(
-        method_name='get_products_count')
-
-    def get_products_count(self, category: Category) -> int:
-        return category.products.count()
+        fields = ['id', 'title', 'product_count']
+    product_count = serializers.IntegerField(read_only=True)
 
 
 class ProductSerializer(serializers.ModelSerializer):

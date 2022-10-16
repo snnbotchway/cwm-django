@@ -1,13 +1,13 @@
-from . import views
-from django.urls import path
+from xml.etree.ElementInclude import include
+from .views import *
+from rest_framework_nested import routers
 
-urlpatterns = [
-    path('products/', views.product_list),
-    path('products/<int:id>/', views.product),
-    path('categories/<int:pk>/', views.category, name='category_detail'),
-    path('categories/', views.category_list, name='category_list'),
-    # path('products/new/', views.contactCreate),
-    # path('contact-edit/<int:pk>', views.contactEdit),
-    # path('contact-delete/<int:pk>', views.contactDelete),
-    # path('upload-csv/', views.uploadCsv),
-]
+router = routers.DefaultRouter()
+router.register('products', ProductViewSet, basename='products')
+router.register('categories', CategoryViewSet)
+
+products_router = routers.NestedDefaultRouter(
+    router, 'products', lookup='product')
+products_router.register('reviews', ReviewViewSet, basename='product-review')
+
+urlpatterns = router.urls + products_router.urls

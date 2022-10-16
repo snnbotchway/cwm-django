@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Promotion(models.Model):
@@ -85,7 +85,8 @@ class Order(models.Model):
         default=PENDING,
     )
     placed_at = models.DateTimeField(auto_now_add=True)
-    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.PROTECT, related_name='orders')
 
     def __str__(self):
         return str(self.customer)
@@ -116,3 +117,12 @@ class Cart(models.Model):
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
+
+
+class Review(models.Model):
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField(blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='reviews')

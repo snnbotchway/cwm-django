@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'tags',
     'link_tag_product',
     'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -149,5 +150,9 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'COERCE_DECIMAL_TO_STRING': False
+    'COERCE_DECIMAL_TO_STRING': False,
+    # for global and no need to define pagination class:
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 10
+    # for custom page number per view, see store/paginations.py
 }
