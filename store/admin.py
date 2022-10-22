@@ -25,7 +25,7 @@ class CustomerAdmin(admin.ModelAdmin):
         return format_html('<a href={}>{}</a>', url, customer.order_count)
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(order_count=Count('order'))
+        return super().get_queryset(request).annotate(order_count=Count('orders'))
 
 
 class InventoryListFilter(admin.SimpleListFilter):
