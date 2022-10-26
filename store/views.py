@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Count
@@ -67,18 +67,31 @@ class ReviewViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
 
-    # def destroy(self, request, *args, **kwargs):
-    #     if Product.objects.filter(category_id=kwargs['pk']).count() > 0:
-    #         return Response({'error': 'Category has been assigned to some products and hence, cannot be deleted'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    #     return super().destroy(request, *args, **kwargs)
 
-
-class CartViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
+class CartViewSet(CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, GenericViewSet):
     serializer_class = CartSerializer
 
     def get_queryset(self):
         return Cart.objects.prefetch_related('cartitems__product').all()
-    # give the serializer the product id from the url:
+
+
+class CartItemViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CartItemSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateCartItemSerializer
+        return AddCartItemSerializer
+
+    # get the cart id from the url:
+    def get_queryset(self):
+        return CartItem.objects.select_related('product').filter(cart_id=self.kwargs['cart_pk'])
+    # give the serializer the cart id from the url:
+
+    def get_serializer_context(self):
+        return {'cart_id': self.kwargs['cart_pk']}
 
 
 # CRUD GENERIC VIEWS

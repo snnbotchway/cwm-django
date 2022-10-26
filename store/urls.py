@@ -1,3 +1,4 @@
+from cgitb import lookup
 from xml.etree.ElementInclude import include
 from .views import *
 from rest_framework_nested import routers
@@ -11,4 +12,9 @@ products_router = routers.NestedDefaultRouter(
     router, 'products', lookup='product')
 products_router.register('reviews', ReviewViewSet, basename='product-review')
 
-urlpatterns = router.urls + products_router.urls
+carts_router = routers.NestedDefaultRouter(
+    router, 'carts', lookup='cart'
+)
+carts_router.register('cartitems', CartItemViewSet, basename='cart-cartitems')
+
+urlpatterns = router.urls + products_router.urls + carts_router.urls
