@@ -9,11 +9,15 @@ from .models import *
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name',
+    autocomplete_fields = ['user']
+    list_display = ['id', 'first_name', 'last_name',
                     'membership', 'email', 'order_count']
     list_editable = ['membership']
     list_per_page = 100
-    search_fields = ['first_name__istartswith', 'last_name__istartswith']
+    list_select_related = ['user']
+    ordering = ['user__first_name', 'user__last_name']
+    search_fields = ['user__first_name__istartswith',
+                     'user__last_name__istartswith']
 
     @admin.display(ordering='order_count')
     def order_count(self, customer):

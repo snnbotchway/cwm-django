@@ -48,9 +48,9 @@ INSTALLED_APPS = [
     'store',
     'likes',
     'tags',
-    'link_tag_product',
     'rest_framework',
     'django_filters',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -156,3 +156,5 @@ REST_FRAMEWORK = {
     # 'PAGE_SIZE': 10
     # for custom page number per view, see store/paginations.py
 }
+
+AUTH_USER_MODEL = "core.User"
