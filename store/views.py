@@ -9,6 +9,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from django.db.models import Count
 # from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+
+from store.permissions import IsAdminOrReadOnly
 from .filters import *
 from .serializers import *
 from .models import Category, Customer, OrderItem, Product, Review, Cart
@@ -18,6 +20,7 @@ from .paginations import ProductPagination
 # CRUD VIEWSETS
 # Inherit from ReadOnlyModelViewSet if you don't need CUD
 class ProductViewSet(ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
     serializer_class = ProductSerializer
 
     # automatic filtering with url params:
@@ -44,6 +47,7 @@ class ProductViewSet(ModelViewSet):
 
 
 class CategoryViewSet(ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Category.objects.annotate(
         product_count=Count('products')
     )
@@ -97,17 +101,15 @@ class CartItemViewSet(ModelViewSet):
         return {'cart_id': self.kwargs['cart_pk']}
 
 
-class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.select_related('user').all()
     serializer_class = CustomerSerializer
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    # extend and customize DjangoModelPermissions to use group permissions
+    # To apply custom permissions, create in model meta, create in permissions.py and apply here
+    permission_classes = [IsAdminUser]
 
     # configure /customers/me/ action to get current user profile
-    @action(detail=False, methods=['GET', 'PUT'])
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
         (customer, created) = Customer.objects.get_or_create(
             user_id=request.user.id)
