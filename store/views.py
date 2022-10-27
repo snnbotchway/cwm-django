@@ -1,15 +1,17 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
+from rest_framework.mixins import ListModelMixin, UpdateModelMixin, CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, IsAdminUser, AllowAny
 from django.db.models import Count
 # from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import *
 from .serializers import *
-from .models import Category, OrderItem, Product, Review, Cart
+from .models import Category, Customer, OrderItem, Product, Review, Cart
 from .paginations import ProductPagination
 
 
@@ -76,7 +78,8 @@ class CartViewSet(CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, Gener
 
 
 class CartItemViewSet(ModelViewSet):
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch',
+                         'delete']  # to prevent put requests
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -93,6 +96,29 @@ class CartItemViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {'cart_id': self.kwargs['cart_pk']}
 
+
+class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    queryset = Customer.objects.select_related('user').all()
+    serializer_class = CustomerSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    # configure /customers/me/ action to get current user profile
+    @action(detail=False, methods=['GET', 'PUT'])
+    def me(self, request):
+        (customer, created) = Customer.objects.get_or_create(
+            user_id=request.user.id)
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer, many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 # CRUD GENERIC VIEWS
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView

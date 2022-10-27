@@ -1,8 +1,9 @@
 from decimal import Decimal
 from django.db.models import F
 from rest_framework import serializers
+from django.conf import settings
 
-from store.models import CartItem, Category, Product, Review, Cart
+from store.models import CartItem, Category, Customer, Product, Review, Cart
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -50,6 +51,14 @@ class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'title', 'unit_price']
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Customer
+        fields = ['id', 'birth_date', 'phone', 'user_id', 'membership']
 
 
 class CartItemSerializer(serializers.ModelSerializer):
