@@ -43,13 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sessions',
-    'playground',
+    'django_filters',
     'debug_toolbar',
+    'djoser',
+    'rest_framework',
+    'playground',
     'store',
     'likes',
     'tags',
-    'rest_framework',
-    'django_filters',
     'core',
 ]
 
@@ -150,11 +151,18 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'COERCE_DECIMAL_TO_STRING': False,
     # for global and no need to define pagination class:
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 10
     # for custom page number per view, see store/paginations.py
+}
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 AUTH_USER_MODEL = "core.User"
