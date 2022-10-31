@@ -112,7 +112,7 @@ class CustomerViewSet(ModelViewSet):
     # configure /customers/me/ action to get current user profile
     @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
-        (customer, created) = Customer.objects.get_or_create(
+        customer = Customer.objects.get(
             user_id=request.user.id)
         if request.method == 'GET':
             serializer = CustomerSerializer(customer, many=False)
@@ -157,7 +157,7 @@ class OrderViewSet(ModelViewSet):
         if user.is_staff:
             return Order.objects.prefetch_related('orderitems__product').all()
         (customer_id, created) = Customer.objects.only(
-            'id').get_or_create(user_id=user.id)
+            'id').get(user_id=user.id)
         return Order.objects.filter(customer_id=customer_id).prefetch_related('orderitems__product')
 
 

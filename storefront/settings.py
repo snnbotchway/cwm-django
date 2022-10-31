@@ -172,5 +172,6 @@ DJOSER = {
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserRegistrationSerializer',
         'current_user': 'core.serializers.UserSerializer',
+        'user': 'core.serializers.UserSerializer',
     }
 }

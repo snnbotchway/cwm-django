@@ -9,6 +9,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+    # add first name and last name to user registration field in admin panel
     add_fieldsets = (
         (
             None,
@@ -26,6 +27,7 @@ class TagInline(GenericTabularInline):
     autocomplete_fields = ['tag']
 
 
+# show products with their tags in admin panel
 class LinkedProductAdmin(ProductAdmin):
     inlines = [TagInline]
 
