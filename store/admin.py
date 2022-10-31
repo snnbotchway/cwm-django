@@ -124,14 +124,22 @@ class OrderItemInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
-    list_display = ['customer', 'payment_status', 'placed_at']
+    list_display = ['customer', 'id', 'payment_status', 'placed_at']
     list_editable = ['payment_status']
     autocomplete_fields = ['customer']
 
 
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    autocomplete_fields = ['product']
+    extra = 0
+    min_num = 1
+    max_num = 10
+
+
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    # inlines = [CartItemInline]
+    inlines = [CartItemInline]
     list_display = ['id', 'created_at']
 
 

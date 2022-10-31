@@ -1,9 +1,76 @@
 from decimal import Decimal
 from django.db.models import F
+from django.db import transaction
 from rest_framework import serializers
 from django.conf import settings
 
-from store.models import CartItem, Category, Customer, Product, Review, Cart
+from .models import CartItem, Category, Customer, Order, OrderItem, Product, Review, Cart
+
+
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price']
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product',
+                  'unit_price', 'quantity']
+
+
+class AddOrderSerializer(serializers.Serializer):
+    cart_id = serializers.UUIDField()
+
+    def validate_cart_id(self, value):
+        # check if cart exists
+        if not Cart.objects.filter(pk=value).exists():
+            raise serializers.ValidationError(
+                'This cart does not exist.')
+        # check if cart is empty (has no cart items associated with it)
+        if CartItem.objects.filter(cart_id=value).count() == 0:
+            raise serializers.ValidationError(
+                'This cart is empty.')
+        return value
+
+    def save(self, **kwargs):
+        with transaction.atomic():
+            cart_id = self.validated_data['cart_id']
+            (customer, created) = Customer.objects.get_or_create(
+                user_id=self.context['user_id'])
+            order = Order.objects.create(customer=customer)
+            cart_items = CartItem.objects.select_related(
+                'product').filter(cart=cart_id)
+            # using list comprehension to create list of order items from list of cart items
+            order_items = [
+                OrderItem(
+                    order=order,
+                    product=item.product,
+                    unit_price=item.product.unit_price,
+                    quantity=item.quantity
+                ) for item in cart_items]
+            OrderItem.objects.bulk_create(order_items)
+            Cart.objects.filter(pk=cart_id).delete()
+            return order
+
+
+class UpdateOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['payment_status']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    orderitems = OrderItemSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Order
+        fields = ['id', 'payment_status',
+                  'placed_at', 'customer', 'orderitems']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -45,12 +112,6 @@ class ProductSerializer(serializers.ModelSerializer):
         return product.unit_price * Decimal(1.1)
 
     # validation method example for password == confirm_password
-
-
-class SimpleProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id', 'title', 'unit_price']
 
 
 class CustomerSerializer(serializers.ModelSerializer):

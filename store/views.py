@@ -1,3 +1,4 @@
+from urllib import request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
@@ -13,7 +14,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from store.permissions import IsAdminOrReadOnly
 from .filters import *
 from .serializers import *
-from .models import Category, Customer, OrderItem, Product, Review, Cart
+from .models import Category, Customer, Order, OrderItem, Product, Review, Cart
 from .paginations import ProductPagination
 
 
@@ -121,6 +122,44 @@ class CustomerViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class OrderViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+
+    def get_permissions(self):
+        # only admins should be able to update or delete order
+        if self.request.method in ['PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
+
+    # override to return saved order instead of cartId
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        headers = self.get_success_headers(serializer.data)
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AddOrderSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateOrderSerializer
+        return OrderSerializer
+
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Order.objects.prefetch_related('orderitems__product').all()
+        (customer_id, created) = Customer.objects.only(
+            'id').get_or_create(user_id=user.id)
+        return Order.objects.filter(customer_id=customer_id).prefetch_related('orderitems__product')
+
 
 # CRUD GENERIC VIEWS
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView

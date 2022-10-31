@@ -109,9 +109,10 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.PROTECT)
+    order = models.ForeignKey(
+        Order, on_delete=models.PROTECT, related_name='orderitems')
     product = models.ForeignKey(
-        Product, on_delete=models.PROTECT, related_name='orderitems')
+        Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -136,7 +137,7 @@ class CartItem(models.Model):
         validators=[MinValueValidator(1)], default=1)
 
     def __str__(self) -> str:
-        return self.product
+        return str(self.product)
 
     class Meta:
         unique_together = [['product', 'cart']]

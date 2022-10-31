@@ -16,6 +16,7 @@ psycopg2 = "*"
 psycopg2-binary = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
+isort = "*"
 
 [dev-packages]
 flake8 = "*"
