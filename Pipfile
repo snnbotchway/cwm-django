@@ -17,6 +17,8 @@ psycopg2-binary = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
 isort = "*"
+pillow = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 flake8 = "*"

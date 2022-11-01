@@ -30,7 +30,7 @@ class ProductViewSet(ModelViewSet):
     #         return Product.objects.filter(category_id=self.request.query_params.get('category_id'))
     #     return Product.objects.all()
     # or when filters get many (better way): set queryset to .all and:
-    queryset = Product.objects.all()
+    queryset = Product.objects.prefetch_related('images').all()
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = ProductPagination
@@ -45,6 +45,18 @@ class ProductViewSet(ModelViewSet):
         if OrderItem.objects.filter(product_id=kwargs['pk']).count() > 0:
             return Response({'error': 'Product has been ordered before and hence, cannot be deleted'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs)
+
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+
+    # get the product id from the url:
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
+    # give the serializer the product id from the url:
+
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
 
 
 class CategoryViewSet(ModelViewSet):

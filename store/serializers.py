@@ -4,7 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 from django.conf import settings
 
-from .models import CartItem, Category, Customer, Order, OrderItem, Product, Review, Cart
+from .models import CartItem, Category, Customer, Order, OrderItem, Product, Review, Cart, ProductImage
 
 
 class SimpleProductSerializer(serializers.ModelSerializer):
@@ -82,6 +82,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         return Review.objects.create(product_id=self.context['product_id'], **validated_data)
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image']
+
+    def create(self, validated_data):
+        return ProductImage.objects.create(product_id=self.context['product_id'], **validated_data)
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -90,10 +99,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    images = ProductImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product
         fields = ['id', 'title', 'slug', 'unit_price',
-                  'description', 'inventory', 'price_inc_tax', 'category']
+                  'description', 'inventory', 'price_inc_tax', 'category', 'images']
 
     price_inc_tax = serializers.SerializerMethodField(
         method_name='get_price_with_tax')
@@ -110,8 +121,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_price_with_tax(self, product: Product) -> Decimal:
         return product.unit_price * Decimal(1.1)
-
-    # validation method example for password == confirm_password
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -187,6 +196,8 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'cartitems', 'total_price']
+
+    # validation method example for password == confirm_password
     # def validate(self, data):
     #     if data['password'] == data['confirm_password']:
     #         return data

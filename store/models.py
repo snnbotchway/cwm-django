@@ -4,6 +4,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from django.contrib import admin
 
+from store.validators import validate_file_size
+
 
 class Promotion(models.Model):
     title = models.CharField(max_length=255)
@@ -46,6 +48,15 @@ class Product(models.Model):
         return self.title
 
 
+class ProductImage(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE,
+        related_name='images'
+    )
+    image = models.ImageField(
+        upload_to='store/products/images', validators=[validate_file_size])
+
+
 class Customer(models.Model):
     BRONZE = 'B'
     SILVER = 'S'
@@ -63,7 +74,9 @@ class Customer(models.Model):
     birth_date = models.DateField(null=True)
     phone = models.CharField(max_length=255)
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
 
     @admin.display(ordering='user__first_name')
     def first_name(self):
@@ -99,7 +112,10 @@ class Order(models.Model):
     )
     placed_at = models.DateTimeField(auto_now_add=True)
     customer = models.ForeignKey(
-        Customer, on_delete=models.PROTECT, related_name='orders')
+        Customer,
+        on_delete=models.PROTECT,
+        related_name='orders'
+    )
 
     def __str__(self):
         return str(self.customer)
@@ -134,7 +150,9 @@ class CartItem(models.Model):
         Cart, on_delete=models.CASCADE, related_name='cartitems')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)], default=1)
+        validators=[MinValueValidator(1)],
+        default=1
+    )
 
     def __str__(self) -> str:
         return str(self.product)
@@ -145,8 +163,15 @@ class CartItem(models.Model):
 
 class Review(models.Model):
     rating = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)])
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5)
+        ]
+    )
     comment = models.TextField(blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name='reviews')
+        Product,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )

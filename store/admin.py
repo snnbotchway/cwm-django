@@ -53,6 +53,18 @@ class InventoryListFilter(admin.SimpleListFilter):
             )
 
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    readonly_fields = ['thumbnail']
+    extra = 0
+    min_num = 1
+    max_num = 10
+
+    def thumbnail(self, instance):
+        if instance.image.name != '':
+            return format_html(f"<img src={instance.image.url} class='thumbnail'>")
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     # exclude title and slug from a product form:
@@ -92,6 +104,11 @@ class ProductAdmin(admin.ModelAdmin):
         if product.inventory < 10:
             return 'Low'
         return 'OK'
+
+    class Media:
+        css = {
+            'all': ['store/styles.css']
+        }
 
 
 @admin.register(Category)
