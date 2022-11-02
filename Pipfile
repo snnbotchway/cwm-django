@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 django = "*"
 django-debug-toolbar = "*"
-autopep8 = "*"
 django-environ = "*"
 virtualenv = "*"
 djangorestframework = "*"
@@ -16,13 +15,19 @@ psycopg2 = "*"
 psycopg2-binary = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
-isort = "*"
 pillow = "*"
 django-cors-headers = "*"
+redis = "*"
+flower = "*"
+celery = "*"
 
 [dev-packages]
 flake8 = "*"
 pylint = "*"
+pytest = "*"
+autopep8 = "*"
+isort = "*"
+pytest-django = "*"
 
 [requires]
 python_version = "3.10"

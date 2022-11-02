@@ -186,3 +186,19 @@ DJOSER = {
         'user': 'core.serializers.UserSerializer',
     }
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = '2525'
+
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_BEAT_SCHEDULE = {
+    "send_feedback_email_task": {
+        "task": "playground.tasks.send_feedback_email_task",
+        "schedule": 5,
+        "args": ['celerybeat@celery.org', 'Scheduled every 5 seconds with celery beat']
+    }
+}
