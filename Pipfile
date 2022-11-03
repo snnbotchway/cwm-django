@@ -20,6 +20,7 @@ django-cors-headers = "*"
 redis = "*"
 flower = "*"
 celery = "*"
+django-redis = "*"
 
 [dev-packages]
 flake8 = "*"
@@ -28,6 +29,10 @@ pytest = "*"
 autopep8 = "*"
 isort = "*"
 pytest-django = "*"
+pytest-watch = "*"
+model-bakery = "*"
+install = "*"
+locust = "*"
 
 [requires]
 python_version = "3.10"
