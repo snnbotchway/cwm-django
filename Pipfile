@@ -12,7 +12,6 @@ djangorestframework = "*"
 drf-nested-routers = "*"
 django-filter = "*"
 psycopg2 = "*"
-psycopg2-binary = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
 pillow = "*"
@@ -21,6 +20,7 @@ redis = "*"
 flower = "*"
 celery = "*"
 django-redis = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 flake8 = "*"
@@ -33,6 +33,7 @@ pytest-watch = "*"
 model-bakery = "*"
 install = "*"
 locust = "*"
+django-silk = "*"
 
 [requires]
 python_version = "3.10"
