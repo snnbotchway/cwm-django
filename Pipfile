@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 django = "*"
 django-debug-toolbar = "*"
-django-environ = "*"
 virtualenv = "*"
 djangorestframework = "*"
 drf-nested-routers = "*"
@@ -21,6 +20,8 @@ flower = "*"
 celery = "*"
 django-redis = "*"
 psycopg2-binary = "*"
+whitenoise = "*"
+django-environ = "*"
 
 [dev-packages]
 flake8 = "*"
