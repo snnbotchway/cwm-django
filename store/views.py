@@ -17,9 +17,10 @@ from .serializers import *
 from .models import Category, Customer, Order, OrderItem, Product, Review, Cart
 from .paginations import ProductPagination
 
-
 # CRUD VIEWSETS
 # Inherit from ReadOnlyModelViewSet if you don't need CUD
+
+
 class ProductViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = ProductSerializer

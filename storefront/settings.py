@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import dj_database_url
 from pathlib import Path
 from datetime import timedelta
 
@@ -32,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['keystonemall-prod.herokuapp.com']
 
 
 # Application definition
@@ -49,7 +50,7 @@ INSTALLED_APPS = [
     'djoser',
     'corsheaders',
     'rest_framework',
-    'silk',
+    # 'silk',
     'playground',
     'store',
     'likes',
@@ -67,14 +68,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'silk.middleware.SilkyMiddleware',
+    # 'silk.middleware.SilkyMiddleware',
 ]
 
-if DEBUG:
-    MIDDLEWARE += [
-        'silk.middleware.SilkyMiddleware',
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ]
+# if DEBUG:
+#     MIDDLEWARE += [
+#         # 'silk.middleware.SilkyMiddleware',
+#         # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+#     ]
 
 
 INTERNAL_IPS = [
@@ -112,15 +113,21 @@ WSGI_APPLICATION = 'storefront.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# for devs
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': env('DATABASE_NAME'),
+#         'USER': env('DATABASE_USER'),
+#         'PASSWORD': env('DATABASE_PASS'),
+#         'HOST': env('DATABASE_HOST'),
+#         'PORT': env('DATABASE_PORT'),
+#     }
+# }
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DATABASE_NAME'),
-        'USER': env('DATABASE_USER'),
-        'PASSWORD': env('DATABASE_PASS'),
-        'HOST': env('DATABASE_HOST'),
-        'PORT': env('DATABASE_PORT'),
-    }
+    'default': dj_database_url.config()
 }
 
 
@@ -202,15 +209,14 @@ DJOSER = {
         'user': 'core.serializers.UserSerializer',
     }
 }
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'localhost'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_PORT = '2525'
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = env('DB_USER')
+EMAIL_HOST_PASSWORD = env('DB_PASSWORD')
+EMAIL_USE_TLS = True
 
 # Celery settings
-CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_BROKER_URL = env('REDIS_URL')
 CELERY_BEAT_SCHEDULE = {
     "send_feedback_email_task": {
         "task": "playground.tasks.send_feedback_email_task",
@@ -223,8 +229,9 @@ CELERY_BEAT_SCHEDULE = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/2",
+        "LOCATION": env('REDIS_URL'),
         "OPTIONS": {
+            "PASSWORD": env('REDIS_PASSWORD'),
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
